@@ -2,9 +2,9 @@ library(shiny)
 library(here)
 library(tidyverse)
 library(ggiraph)
+library(patchwork)
 
 last_updated <- 'blah'
-
 
 # App Parameters ----------------------------------------------------------
 
@@ -28,10 +28,17 @@ load(here('data', 'moving_average_data.RData'))
 ui <- fluidPage(
   
     # Application title
-  titlePanel(paste0('Syphilis in Southwest District Health, ',
-                    min(count_year$year), ' - ',
-                    max(count_year$year))
-             ),
+  titlePanel(
+    h1(paste(
+      "Syphilis in Southwest Idaho, ",
+      min(count_year$year),
+      "-",
+      max(count_year$year)
+    ), style = "background-color:#004478;
+                padding-left: 15px;
+                color:#FFFFFF"),
+    windowTitle = "Epidemiology - Southwest District Health"
+  ),
   fluidRow(
     column(2, 
            selectInput('year', label = NULL, choices = unique(county_incidence_data$year)))
@@ -39,9 +46,10 @@ ui <- fluidPage(
   fluidRow(
     column(4, ggiraphOutput('map_plot', height = '600px')
            ), 
-    column(8, ggiraphOutput('moving_plot'), plotOutput('year_plot'))
+    column(8, ggiraphOutput('ma_year_plots')
   )
 
+)
 )
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -69,7 +77,7 @@ server <- function(input, output) {
       ) + 
       coord_fixed(1.3) +
       ggtitle(paste(
-        "Cumulative Incidence Rate by County",
+        "Cumulative Incidence Rate by County, ",
         min(count_year$year),
         "-",
         max(count_year$year)
@@ -93,11 +101,11 @@ server <- function(input, output) {
     )
   })
   
-  moving_average_plot <- reactive({
+  ma_year_plots <- reactive({
     plot1 <- moving_average_data %>% 
       ggplot(aes(x = month, y = moving_average)) + 
       geom_line(color = 'red',
-                linewidth = 3) +
+                linewidth = 5.5) +
       geom_point_interactive(color = 'red',
                              aes(
                                data_id = month, 
@@ -106,21 +114,40 @@ server <- function(input, output) {
                                  month, as.character(round(moving_average, 2))
                                )
                              ), 
-                             size = 2) + 
+                             size = 5) + 
       xlab('Date') + 
-      ylab('90-day average of cases')
+      ylab('90-day Average of Cases') +
+      theme(text = element_text(size = 25))
     
-
+    plot2 <- count_year %>% 
+      ggplot(aes(x = year, y = count)) + 
+      geom_col_interactive(aes(fill = diagnosis, 
+                               data_id = diagnosis, 
+                               tooltip = sprintf(
+                                 'Diagnosis: %s\nCase Count: %s', diagnosis, 
+                                 as.character(round(count, 2))
+                               ))) +
+      theme(text = element_text(size = 25)) +
+      ylab('Cases Count') + 
+      xlab('Date') +
+      guides(fill = guide_legend(title = 'Diagnosis')) +
+      scale_fill_manual(values = c('#b3e0a6', '#87cc79', '#49964f', '#24693d', 
+                                            '#194a2b', 
+                                            '#6b8baa'))
+    
+    this_list <- list(plot1, plot2)
+    
+    design <- '
+    A
+    B'
+    these_plots <- wrap_plots(this_list, design = design)
     
   })
   
-  output$year_plot <- renderPlot({
-    count_year %>% 
-      ggplot(aes(x = year, y = count)) + geom_col(aes(fill = diagnosis))
-  })
   
-  output$moving_plot <- renderggiraph({
-    plot <- girafe(ggobj = moving_average_plot())
+  output$ma_year_plots <- renderggiraph({
+    plot <- girafe(ggobj = ma_year_plots(), width_svg = 20, 
+                   height_svg = 10)
   })
 
   
