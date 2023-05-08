@@ -3,7 +3,7 @@ library(here)
 library(tidyverse)
 library(ggiraph)
 library(patchwork)
-
+library(tsibble)
 last_updated <- 'blah'
 
 # App Parameters ----------------------------------------------------------
@@ -101,7 +101,7 @@ server <- function(input, output) {
     )
   })
   
-  ma_year_plots <- reactive({
+  ma_year_plot <- reactive({
     plot1 <- moving_average_data %>% 
       ggplot(aes(x = month, y = moving_average)) + 
       geom_line(color = 'red',
@@ -111,7 +111,7 @@ server <- function(input, output) {
                                data_id = month, 
                                tooltip = sprintf(
                                  'Month: %s\n90-day moving average: %s', 
-                                 month, as.character(round(moving_average, 2))
+                                 as.character(month), as.character(round(moving_average, 2))
                                )
                              ), 
                              size = 5) + 
@@ -146,8 +146,9 @@ server <- function(input, output) {
   
   
   output$ma_year_plots <- renderggiraph({
-    plot <- girafe(ggobj = ma_year_plots(), width_svg = 20, 
+    plot <- girafe(ggobj = ma_year_plot(), width_svg = 20, 
                    height_svg = 10)
+    plot
   })
 
   
