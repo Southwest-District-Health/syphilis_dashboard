@@ -1,0 +1,11 @@
+name: syphilis_dashboard
+title:
+username:
+account: swdh
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9055967
+bundleId: 7189276
+url: https://swdh.shinyapps.io/syphilis_dashboard/
+when: 1683557496.7199
+lastSyncTime: 1683557496.71994

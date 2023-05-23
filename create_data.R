@@ -78,11 +78,12 @@ moving_average_data <- data %>%
   mutate('month' = yearmonth(mdy_hms(investigation_start_date))) %>% 
   group_by(month) %>% 
   summarize('count' = n()) %>% 
+  as_tsibble(index = month) %>% 
+  fill_gaps(count = 0) %>% 
   mutate('moving_average' = rollmean(count, 
                                      k = 3, 
                                      align = 'right', 
                                      fill = 'extend'))
-
 
 count_year <- data %>% 
   mutate('year' = year(mdy_hms(investigation_start_date))) %>% 
@@ -90,6 +91,19 @@ count_year <- data %>%
   summarize('count' = n())
 
 
+table_data <- data %>% 
+  filter(outbreak_name == '2021_012') %>% 
+  select(investigation_start_date,
+         patient_county, 
+         patient_sex, 
+         patient_race, 
+         patient_age,
+         patient_hispanic,
+         pregnant_interview,
+         incarcerated_12:num_transgender_partners
+         ) %>% 
+  mutate('date' = yearmonth(mdy_hms(investigation_start_date)))
+  
 # Save Data ---------------------------------------------------------------
 
 save(county_map_data, file = here('data', 'county_map_data.RData'))
