@@ -8,7 +8,7 @@ library(knitr)
 library(kableExtra)
 library(lubridate)
 
-last_updated <- "2023-06-13 13:11:33 MDT"
+last_updated <- "2023-06-21 12:24:48 MDT"
 
 new_date <- readLines(here('new_data', 'date_created.txt'))
 old_date <- readLines(here('old_data', 'date_created.txt'))
@@ -277,7 +277,7 @@ final_table <- big_table %>%
   kable(format = 'html', caption = 'Case Demographics') 
   
 
-headers <- c('Year', 'Sex', 'Race', 'Ethnicity', 'Age', 'Pregnant at interview', 'Male partner last 12 months', 'Female partner last 12 months', 'Partner who is transgender last 12 months', 'Anonymous partner last 12 months', 'Incarcerated last 12 months', 'Used injection drugs last 12 months', 'Met partner over the internet', 
+headers <- c('Year', 'Sex', 'Race', 'Ethnicity', 'Age', 'Pregnant at interview', 'Male partner last 12 months', 'Female partner last 12 months', 'Partner who is transgender last 12 months', 'Anonymous partner last 12 months', 'Incarcerated last 12 months', 'Persons who inject drugs last 12 months', 'Met partner over the internet', 
              'HIV status')
 
 for (subtable in 1:length(headers)){
@@ -324,10 +324,10 @@ ui <- fluidPage(
       
     )), 
     tabPanel('Professional',
-             fluidRow(paste0('New data created on: ', 
+             fluidRow(paste0('New data report run on: ', 
                              new_date, 
-                             '.', 
-                             'Old data created on: ', 
+                             '. ', 
+                             'Old data report run on: ', 
                              old_date, 
                              '.')),
              fluidRow(
@@ -376,7 +376,9 @@ server <- function(input, output) {
         guide = "none"
       ) +
       theme_void() + 
-      theme(plot.title = element_text(size = 12.5))
+      theme(plot.title = element_text(size = 12.5), 
+            legend.text = element_text(size = 14), 
+            legend.title = element_text(size = 14))
   })
   
   output$map_plot <- renderggiraph({
@@ -405,7 +407,7 @@ server <- function(input, output) {
                              size = 5) + 
       xlab('Date') + 
       ylab('90-day Average of Cases') +
-      theme(text = element_text(size = 25))
+      theme(text = element_text(size = 30))
     
     plot2 <- count_year %>% 
       ggplot(aes(x = year, y = count)) + 
@@ -415,7 +417,7 @@ server <- function(input, output) {
                                  'Diagnosis: %s\nCase Count: %s', diagnosis, 
                                  as.character(round(count, 2))
                                ))) +
-      theme(text = element_text(size = 25)) +
+      theme(text = element_text(size = 30)) +
       ylab('Cases Count') + 
       xlab('Date') +
       guides(fill = guide_legend(title = 'Diagnosis')) +
@@ -459,13 +461,15 @@ server <- function(input, output) {
                              size = 4) + 
       xlab('Date') + 
       ylab('90-day Average of Cases') +
-      theme(text = element_text(size = 35)) + 
-      ggtitle('Outbreak cases 90-day moving average') + 
-      theme_bw()
+      theme_bw() + 
+      theme(text = element_text(size = 35), 
+            axis.text.x = element_text(angle = 90)) + 
+      ggtitle('Outbreak cases 90-day moving average') 
+      
   })
     
   output$outbreak_ggiraph <- renderggiraph({
-    girafe(ggobj = outbreak_plot(), width_svg = 12)
+    girafe(ggobj = outbreak_plot(), width_svg = 20, height_svg = 8)
     
   })
   
