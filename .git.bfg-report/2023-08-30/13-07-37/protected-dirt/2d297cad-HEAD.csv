@@ -1,0 +1,5 @@
+39500496603adc2abdeb0486e95b8a9e9091f9f4,DELETE,regular-file,data/count_year.RData,571,
+00bbe08b48e16249c91448a35afd5e3e122b67d4,DELETE,regular-file,data/county_incidence_data.RData,610,
+54bafa05f4d9ae303ef2f6a6bebccbe39f7c2ed8,DELETE,regular-file,data/county_map_data.RData,1397,
+d8d4639b5fe5d4de35443087ff59f0933d2184ef,DELETE,regular-file,data/moving_average_data.RData,927,
+d679156d399ae7cd88ad018314482bfc00a4d427,DELETE,regular-file,data/outbreak_moving_average_data.RData,689,
