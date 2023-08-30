@@ -2,3 +2,9 @@
 .Rproj.user*
 .Rproj.user/*
 .Rproj.user
+old_data
+new_data
+data
+old_data/*
+new_data/*
+data/*
